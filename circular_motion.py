@@ -21,15 +21,12 @@ if __name__ == "__main__":
     p.move_joint(numpy.array([0.0, 0.0, .20, 0.0, 0.0, 0.0, 0.0])) # removing the tooltip
 
     radius = 0.05
-
-    k =p.get_current_position() 
     initialpos =PyKDL.Vector(p.get_current_position()[0,3], p.get_current_position()[1,3], p.get_current_position()[2,3]) #getting the initial endeffector position
-    perp = PyKDL.Vector(k[0,0], k[0,1], k[0,2]) #the vector perpendicular to the tooltip
-    parallel = PyKDL.Vector(k[2,0], k[2,1], k[2,2])*-1  #vector from center of the circle to the point on the circle (tooltip)
+    perp = PyKDL.Vector(k[0,0], k[1,0], k[2,0]) #the vector perpendicular to the tooltip
+    parallel = PyKDL.Vector(k[0,2], k[1,2], k[2,2])*-1  #vector from center of the circle to the point on the circle (tooltip)
     center = initialpos-radius*parallel
-
-    temp = 0
-
+    temp = 1
+    
     for x in xrange(90): #first 90 degrees in 1 degree increments 
               angle = temp
               k= (radius * math.cos(math.pi*angle/180) * parallel) +radius*math.sin(math.pi*angle/180)*perp*parallel+center
