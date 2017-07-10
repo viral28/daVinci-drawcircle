@@ -1,5 +1,5 @@
 # 28th June, 2017
-#Viral 
+#Viral
 # The following code moves the PSM such that it follows the trajectory of the arc of a circle. 90 degrees in one direction
 #and then reverses that trajectory until it reaches its initial position and repeats the same thing on the other direction
 # Input Arguments: rotational axis
@@ -9,7 +9,7 @@ import sys
 import argparse
 import dvrk
 import numpy
-import PyKDL 
+import PyKDL
 import time
 import numpy as np
 import math
@@ -39,51 +39,51 @@ if __name__ == "__main__":
 #    zz = int(args.zz)
 #    rotmatrix=PyKDL.Rotation(xx,yx,zx,xy,yy,zy,zx,zy,zz)
 
-    p = dvrk.psm("PSM1")
-    p.home()
-    p.move_joint(numpy.array([0.0, 0.0, .20, 0.2, 0.0, 0.0, .3])) # removing the tooltip
+    p = dvrk.psm("PSM3")
+    #p.home()
+    #p.move_joint(numpy.array([0.0, 0.0, .20, 0.0, 0.0, 0.0, .3])) # removing the tooltip
 
-    k =p.get_current_position() 
+    initialframe =p.get_current_position()
     radius = 0.05##int(args.radius)
-    initialpos = p.get_current_position().p #getting the initial endeffector position
-   
+    initialpos = initialframe.p #getting the initial endeffector position
+    initialrot = initialframe.M
+  
     #rot_axis = PyKDL.Vector(k[0,0], k[1,0], k[2,0]) #the vector rot_axisendicular to the tooltip - the the rotation vector of the circle
-    rot_axis = PyKDL.Vector(0,1,0)
+    rot_axis = PyKDL.Vector(1,0,0)
     rot_axis = rot_axis/PyKDL.Vector.Norm(rot_axis)
-   
-    parallel = PyKDL.Vector(k[0,2], k[1,2], k[2,2])*-1  #vector from center of the circle to the point on the circle (tooltip)
+  
+    parallel = initialrot.UnitZ()*-1  #vector from center of the circle to the point on the circle (tooltip)
     center = initialpos-radius*parallel
-    temp = 1
-    time.sleep(0.5) 
-    for angle in range(0, -46, -1): #first 90 degrees in 1 degree increments 
-              
+    time.sleep(0.5)
+    for angle in range(0, -46, -1): #first 90 degrees in 1 degree increments
+             
               k= (radius * math.cos(math.pi*angle/180) * parallel) +radius*math.sin(math.pi*angle/180)*rot_axis*parallel+center
               p.move(k)
-              currentpos = k 
-              zz = center - currentpos 
+              currentpos = k
+              zz = center - currentpos
               zz = zz/PyKDL.Vector.Norm(zz) #z component of the rotation matrix
-              y = zz*rot_axis #y component of the rotation matrix
-              rotmatrix = PyKDL.Rotation(rot_axis,y,zz) #since the y axis of the tooltip is parellel to the y axis of the global rotation matrix
-             
+              y = zz * rot_axis #y component of the rotation matrix
+              rotmatrix = PyKDL.Rotation(rot_axis, y, zz) #since the y axis of the tooltip is parellel to the y axis of the global rotation matrix
+            
+              p.move(rotmatrix)
+           
+              time.sleep(0.5)  
+            
+    for angle in range(-45,46,1):
+            
+              k= (radius * math.cos(math.pi*angle/180) * parallel) +radius*math.sin(math.pi*angle/180)*rot_axis*parallel+center
+              p.move(k)
+              currentpos = k
+              zz = center - currentpos
+              zz = zz/PyKDL.Vector.Norm(zz)
+              y = zz*rot_axis
+              rotmatrix = PyKDL.Rotation(rot_axis,y,zz)
               p.move(rotmatrix)
             
-              #time.sleep(0.5)   
-             
-    for angle in range(-45,46,1):
-             
-              k= (radius * math.cos(math.pi*angle/180) * parallel) +radius*math.sin(math.pi*angle/180)*rot_axis*parallel+center
-              p.move(k)
-              currentpos = k
-              zz = center - currentpos
-              zz = zz/PyKDL.Vector.Norm(zz)
-              y = zz*rot_axis
-              rotmatrix = PyKDL.Rotation(rot_axis,y,zz)
-              p.move(rotmatrix)
-             
-             # time.sleep(0.5)    
+              time.sleep(0.5)   
  
     for angle in range(45,0, -1):
-             
+            
               k= (radius * math.cos(math.pi*angle/180) * parallel) +radius*math.sin(math.pi*angle/180)*rot_axis*parallel+center
               p.move(k)
               currentpos = k
@@ -92,9 +92,6 @@ if __name__ == "__main__":
               y = zz*rot_axis
               rotmatrix = PyKDL.Rotation(rot_axis,y,zz)
               p.move(rotmatrix)
-         
-             # time.sleep(0.5)
-
-
-
+        
+              time.sleep(0.5)
 
